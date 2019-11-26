@@ -1,0 +1,52 @@
+=>nasm -felf64 hello.nasm -o hello.o
+
+=>ld hello.o -o hello
+
+=>gdb ./hello
+
+=>We are going to set the disassembling mode to Intel:
+	set disassembly-flavor intel
+
+=>put our breakpoint at _start :
+	break _start
+
+=>we can find a lot of command options using the command :
+	peda
+=>run application
+	run
+
+=>execute 1 instraction
+	stepi or s
+
+=>see taxt inside mempry address
+	xprint 0x6000d8
+
+=>memory dump in hex form
+	peda hexprint 0x6000d8 or peda hexdump 0x6000d8
+=> countinue to run all frogtam in one stap
+	countinue
+
+
+
+<------------------------------------------c File---------------------------------------------->
+=>gcc hello.c -o hello
+=>gdb ./hello
+=>set disassembly-flavor intel
+=>break main
+=>disassemble method
+	disassemble main
+=>run
+
+
+<--------------------------------------------------------------------------------------------->
+
+=>see last element in stack:
+	x/x $rsp or x/wx $rsp
+	x/200x $rsp             //200hex
+=>find how many char. space in runing or runed program
+	/usr/share/metasploit-framework/tools/exploit# ./pattern_offset.rb -q 0x6a41396941386941[last element] -l 300[max length]
+
+
+=>for checking chanari ,NX,fortify, relro, pie
+	peda checksec
+

@@ -1,0 +1,92 @@
+=>make a hello shellcode and convert an executable form to machine code.We need to use the objdump command
+	objdump -D -M intel hello
+
+=>Generate Shellcode
+	objdump -M intel -D FILE-NAME | grep '[0-9a-f]:' | cut -f2 -d: | cut -f1-7 -d' ' | tr -s ' ' | tr '\t' ' ' | sed 's/ $//g' | sed 's/ /\\\x/g' | paste -d '' -s
+	output:\xb8\x01\x00\x00\x00\xbf\x01\x00\x00\x00\x48\xbe\x00\x20\x40\x00\x00\x00\x00\x00\xba\x0c\x00\x00\x00\x0f\x05\xb8\x3c\x00\x00\x00\xbf\x0b\x00\x00\x00\x0f\x05\x68\x65\x6c\x6c\x6f\x20\x74\x68\x65\x72\x65\x0a
+
+=>then use in c file:hello-world.c
+	#include<stdio.h>
+	#include<string.h>
+	unsigned char code[] =
+	"\xb8\x01\x00\x00\x00\xbf\x01\x00\x00\x00\x48\xbe\xd8\x00\x60
+	\x00\x00\x00\x00\x00\xba\x0c\x00\x00\x00\x0f\x05\xb8\x3c\x00
+	\x00\x00\xbf\x01\x00\x00\x00\x0f\x05\x68\x65\x6c\x6c\x6f\x20
+	\x77\x6f\x72\x6c\x64\x0a";
+	int main()
+	{
+		printf("Shellcode Length: %d\n", (int)strlen(code));
+		int (*ret)() = (int(*)())code;
+		ret();
+	}
+
+=>compile and run 
+	gcc -fno-stack-protector -z execstack hello-world.c
+	./a.out
+
+=>list of bad characters:
+	00 : This is the zero value or null terminator ( \0 )
+	0A : This is the line feed ( \n )
+	FF : This is the form feed ( \f )
+	0D : This is the carriage return ( \r )
+
+=>why bad characters occure
+		The first instruction is mov rax, 1 , and it contains 0 because we were trying to move 1
+	byte (8 bits) to a 64-bit register. So it would fill the rest with zeros, which we can fix using
+	mov al, 1 , so we moved 1 byte (8 bits) to an 8-bit part of the RAX register
+
+=>remove bad characters
+	-memory
+		rax to al
+	-Arithmetic
+		xor rdi[Register], rdi[Register] #clear the register
+		add rdi, 1
+	-relative address technique:define before use with rel
+		lea rsi, [rel hello_world]
+	-jump call technique
+		jmp string
+		code:code
+		string:data
+			call code
+	-stack technique:convert string helloworld in encode hex than put 8 byte at stack
+		push 0x0a646c72
+		mov rbx, 0x6f57206f6c6c6548
+		push rbx
+
+=>function number find
+	cat /usr/include/x86_64-linux-gnu/asm/unistd_64.h | grep bind
+
+		
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
