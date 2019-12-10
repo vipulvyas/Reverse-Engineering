@@ -50,3 +50,14 @@
 =>for checking chanari ,NX,fortify, relro, pie
 	peda checksec
 
+
+=>desable NX protection
+	gcc -fno-stack-protector -z execstack nx.c -o nx
+
+=>enable NX protection
+	gcc -fno-stack-protector nx.c -o nx
+
+=>enavle canary:canary is flag which written beffore the variable so, buffer overflow value overwite the canary so no flag found and not execute
+	gcc -z execstack canary.c -o canary
+
+=>
